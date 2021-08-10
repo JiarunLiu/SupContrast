@@ -6,7 +6,8 @@ import argparse
 import time
 import math
 
-import tensorboard_logger as tb_logger
+# import tensorboard_logger as tb_logger
+import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
 from torchvision import transforms, datasets
@@ -175,11 +176,13 @@ def set_loader(opt):
         raise ValueError(opt.dataset)
 
     if opt.noise > 0:
-        train_noisy_labels, _ = noisify(train_labels=train_dataset.targets,
+        train_labels = np.expand_dims(np.asarray(train_dataset.targets), 1)
+        train_noisy_labels, _ = noisify(train_labels=train_labels,
                                         nb_classes=10,
                                         noise_type="symmetric",
                                         noise_rate=opt.noise)
-        assert train_noisy_labels.shape == train_dataset.targets.shape
+        train_noisy_labels = train_noisy_labels.flatten().tolist()
+        assert len(train_noisy_labels) == len(train_dataset.targets)
         train_dataset.targets = train_noisy_labels
 
     train_sampler = None
