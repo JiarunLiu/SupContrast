@@ -17,6 +17,8 @@ from util import set_optimizer, save_model
 from networks.resnet_big import SupConResNet
 from losses import SupConLoss
 
+from noisy_dataset import noisify
+
 try:
     import apex
     from apex import amp, optimizers
@@ -76,6 +78,10 @@ def parse_option():
                         help='warm-up for large batch training')
     parser.add_argument('--trial', type=str, default='0',
                         help='id for recording multiple runs')
+
+    # noisify
+    parser.add_argument('--noise', type=float, default=0.0,
+                        help="noise ratio of dataset, default: 0.0.")
 
     opt = parser.parse_args()
 
@@ -167,6 +173,14 @@ def set_loader(opt):
                                             transform=TwoCropTransform(train_transform))
     else:
         raise ValueError(opt.dataset)
+
+    if opt.noise > 0:
+        train_noisy_labels, _ = noisify(train_labels=train_dataset.targets,
+                                        nb_classes=10,
+                                        noise_type="symmetric",
+                                        noise_rate=opt.noise)
+        assert train_noisy_labels.shape == train_dataset.targets.shape
+        train_dataset.targets = train_noisy_labels
 
     train_sampler = None
     train_loader = torch.utils.data.DataLoader(
