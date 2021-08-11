@@ -176,6 +176,7 @@ def set_loader(opt):
         raise ValueError(opt.dataset)
 
     if opt.noise > 0:
+        # noisify labels
         train_labels = np.expand_dims(np.asarray(train_dataset.targets), 1)
         train_noisy_labels, _ = noisify(train_labels=train_labels,
                                         nb_classes=10,
@@ -184,6 +185,9 @@ def set_loader(opt):
         train_noisy_labels = train_noisy_labels.flatten().tolist()
         assert len(train_noisy_labels) == len(train_dataset.targets)
         train_dataset.targets = train_noisy_labels
+        # save noise labels as npy
+        np.save(os.path.join(opt.save_folder, 'y.npy'),
+                np.asarray(train_noisy_labels))
 
     train_sampler = None
     train_loader = torch.utils.data.DataLoader(

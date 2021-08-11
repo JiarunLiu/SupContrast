@@ -6,6 +6,7 @@ import argparse
 import time
 import math
 
+import numpy as np
 import tensorboard_logger as tb_logger
 import torch
 import torch.backends.cudnn as cudnn
@@ -63,6 +64,8 @@ def parse_option():
                         help='warm-up for large batch training')
     parser.add_argument('--trial', type=str, default='0',
                         help='id for recording multiple runs')
+    parser.add_argument('--yfile', type=str, default=None,
+                        help='path to noisy labels')
 
     opt = parser.parse_args()
 
@@ -155,6 +158,12 @@ def set_loader(opt):
                                         transform=val_transform)
     else:
         raise ValueError(opt.dataset)
+
+    if opt.yfile is not None:
+        train_noisy_labels = np.load(opt.yfile)
+        train_noisy_labels = train_noisy_labels.tolist()
+        assert len(train_noisy_labels) == len(train_dataset.targets)
+        train_dataset.targets = train_noisy_labels
 
     train_sampler = None
     train_loader = torch.utils.data.DataLoader(
