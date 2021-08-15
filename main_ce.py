@@ -17,6 +17,8 @@ from util import adjust_learning_rate, warmup_learning_rate, accuracy
 from util import set_optimizer, save_model
 from networks.resnet_big import SupCEResNet
 
+from noisy_dataset import noisify
+
 try:
     import apex
     from apex import amp, optimizers
@@ -54,6 +56,8 @@ def parse_option():
     parser.add_argument('--model', type=str, default='resnet50')
     parser.add_argument('--dataset', type=str, default='cifar10',
                         choices=['cifar10', 'cifar100'], help='dataset')
+    parser.add_argument('--data_folder', type=str, default=None,
+                        help='path to custom dataset')
 
     # other setting
     parser.add_argument('--cosine', action='store_true',
@@ -64,13 +68,18 @@ def parse_option():
                         help='warm-up for large batch training')
     parser.add_argument('--trial', type=str, default='0',
                         help='id for recording multiple runs')
+
+    # noisify
+    parser.add_argument('--noise', type=float, default=0.0,
+                        help="noise ratio of dataset, default: 0.0.")
     parser.add_argument('--yfile', type=str, default=None,
                         help='path to noisy labels')
 
     opt = parser.parse_args()
 
     # set the path according to the environment
-    opt.data_folder = './datasets/'
+    if opt.data_folder is None:
+        opt.data_folder = './datasets/'
     opt.model_path = './save/SupCon/{}_models'.format(opt.dataset)
     opt.tb_path = './save/SupCon/{}_tensorboard'.format(opt.dataset)
 
@@ -158,6 +167,20 @@ def set_loader(opt):
                                         transform=val_transform)
     else:
         raise ValueError(opt.dataset)
+
+    if opt.noise > 0:
+        # noisify labels
+        train_labels = np.expand_dims(np.asarray(train_dataset.targets), 1)
+        train_noisy_labels, _ = noisify(train_labels=train_labels,
+                                        nb_classes=10,
+                                        noise_type="symmetric",
+                                        noise_rate=opt.noise)
+        train_noisy_labels = train_noisy_labels.flatten().tolist()
+        assert len(train_noisy_labels) == len(train_dataset.targets)
+        train_dataset.targets = train_noisy_labels
+        # save noise labels as npy
+        np.save(os.path.join(opt.save_folder, 'y.npy'),
+                np.asarray(train_noisy_labels))
 
     if opt.yfile is not None:
         train_noisy_labels = np.load(opt.yfile)
