@@ -9,26 +9,42 @@
 #python main_supcon.py --batch_size 1024 --learning_rate 0.5 --temp 0.1 --cosine \
 #  --noise 0.4 --data_folder ./data/cifar10 --method SupCon
 
-python main_supcon.py --batch_size 1024 --learning_rate 0.5 --temp 0.1 --cosine \
-  --noise 0.6 --data_folder ./data/cifar10 --method SupCon
+#python main_supcon.py --batch_size 1024 --learning_rate 0.5 --temp 0.1 --cosine \
+#  --noise 0.6 --data_folder ./data/cifar10 --method SupCon
 
 #python main_supcon.py --batch_size 1024 --learning_rate 0.5 --temp 0.1 --cosine \
 #  --noise 0.8 --data_folder ./data/cifar10 --method SupCon
 
+## Training SimCLR features (without labels)
+#python main_supcon.py --batch_size 1024 --learning_rate 0.5 --temp 0.5 --cosine \
+#  --noise 0.0 --data_folder ./data/cifar10 --method SimCLR
+#
+#python main_supcon.py --batch_size 1024 --learning_rate 0.5 --temp 0.5 --cosine \
+#  --noise 0.2 --data_folder ./data/cifar10 --method SimCLR
+#
+#python main_supcon.py --batch_size 1024 --learning_rate 0.5 --temp 0.5 --cosine \
+#  --noise 0.4 --data_folder ./data/cifar10 --method SimCLR
+#
+#python main_supcon.py --batch_size 1024 --learning_rate 0.5 --temp 0.5 --cosine \
+#  --noise 0.6 --data_folder ./data/cifar10 --method SimCLR
+#
+#python main_supcon.py --batch_size 1024 --learning_rate 0.5 --temp 0.5 --cosine \
+#  --noise 0.8 --data_folder ./data/cifar10 --method SimCLR
+
 # Training SimCLR features (without labels)
-python main_supcon.py --batch_size 1024 --learning_rate 0.5 --temp 0.5 --cosine \
+python main_supcon.py --batch_size 1024 --learning_rate 0.5 --temp 0.1 --cosine \
   --noise 0.0 --data_folder ./data/cifar10 --method SimCLR
 
-python main_supcon.py --batch_size 1024 --learning_rate 0.5 --temp 0.5 --cosine \
+python main_supcon.py --batch_size 1024 --learning_rate 0.5 --temp 0.1 --cosine \
   --noise 0.2 --data_folder ./data/cifar10 --method SimCLR
 
-python main_supcon.py --batch_size 1024 --learning_rate 0.5 --temp 0.5 --cosine \
+python main_supcon.py --batch_size 1024 --learning_rate 0.5 --temp 0.1 --cosine \
   --noise 0.4 --data_folder ./data/cifar10 --method SimCLR
 
-python main_supcon.py --batch_size 1024 --learning_rate 0.5 --temp 0.5 --cosine \
+python main_supcon.py --batch_size 1024 --learning_rate 0.5 --temp 0.1 --cosine \
   --noise 0.6 --data_folder ./data/cifar10 --method SimCLR
 
-python main_supcon.py --batch_size 1024 --learning_rate 0.5 --temp 0.5 --cosine \
+python main_supcon.py --batch_size 1024 --learning_rate 0.5 --temp 0.1 --cosine \
   --noise 0.8 --data_folder ./data/cifar10 --method SimCLR
 
 
