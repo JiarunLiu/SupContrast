@@ -16,7 +16,7 @@ from util import TwoCropTransform, AverageMeter
 from util import adjust_learning_rate, warmup_learning_rate
 from util import set_optimizer, save_model
 from networks.resnet_big import SupConResNet
-from losses import SupConLoss, WSupConLoss
+from losses import SupConLoss, WeightedSupConLoss
 
 from noisy_dataset import noisify
 from DatasetWrapper import DatasetWrapper
@@ -69,7 +69,8 @@ def parse_option():
 
     # method
     parser.add_argument('--method', type=str, default='SupCon',
-                        choices=['SupCon', 'SimCLR'], help='choose method')
+                        choices=['SupCon', 'SimCLR', 'WSupCon_GT', 'WSupCon'],
+                        help='choose method')
 
     # temperature
     parser.add_argument('--temp', type=float, default=0.07,
@@ -207,7 +208,7 @@ def set_loader(opt):
 def set_model(opt):
     model = SupConResNet(name=opt.model)
     # criterion = SupConLoss(temperature=opt.temp)
-    criterion = WSupConLoss(temperature=opt.temp)
+    criterion = WeightedSupConLoss(temperature=opt.temp)
 
     # enable synchronized Batch Normalization
     if opt.syncBN:
@@ -239,6 +240,7 @@ def train(train_loader, model, criterion, optimizer, epoch, opt):
         if torch.cuda.is_available():
             images = images.cuda(non_blocking=True)
             labels = labels.cuda(non_blocking=True)
+            not_noise = not_noise.cuda(non_blocking=True)
         bsz = labels.shape[0]
 
         # warm-up learning rate
@@ -252,9 +254,11 @@ def train(train_loader, model, criterion, optimizer, epoch, opt):
             loss = criterion(features, labels)
         elif opt.method == 'SimCLR':
             loss = criterion(features)
+        elif opt.method == 'WSupCon_GT':
+            weights = not_noise.float()
+            loss = criterion(features, weights=weights)
         elif opt.method == 'WSupCon':
-            weight = torch.Tensor()
-            loss = criterion(features, weight=weight)
+            raise NotImplementedError("The way to assign weight is not implemented")
         else:
             raise ValueError('contrastive method not supported: {}'.
                              format(opt.method))

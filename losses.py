@@ -98,7 +98,7 @@ class SupConLoss(nn.Module):
         return loss
 
 
-class WSupConLoss(nn.Module):
+class WeightedSupConLoss(nn.Module):
     """
     Weighted Supervised Contrastive Learning.
     It also supports the Supervised contrastive loss in SupCon and unsupervised
@@ -106,12 +106,12 @@ class WSupConLoss(nn.Module):
     """
     def __init__(self, temperature=0.07, contrast_mode='all',
                  base_temperature=0.07):
-        super(WSupConLoss, self).__init__()
+        super(WeightedSupConLoss, self).__init__()
         self.temperature = temperature
         self.contrast_mode = contrast_mode
         self.base_temperature = base_temperature
 
-    def forward(self, features, labels=None, mask=None, weight=None):
+    def forward(self, features, labels=None, mask=None, weights=None):
         """Compute loss for model. If both `labels` and `mask` are None,
         it degenerates to SimCLR unsupervised loss:
         https://arxiv.org/pdf/2002.05709.pdf
@@ -148,6 +148,12 @@ class WSupConLoss(nn.Module):
         else:
             mask = mask.float().to(device)
 
+        # if weight is not assigned, set weight to 1 for all sample
+        if weights is None:
+            weights = torch.ones(batch_size, dtype=torch.float32, device=device)
+        w = torch.cat([weights, weights])
+        w = w.repeat(w.shape[0], 1)
+
         contrast_count = features.shape[1]
         contrast_feature = torch.cat(torch.unbind(features, dim=1), dim=0)
         if self.contrast_mode == 'one':
@@ -182,6 +188,7 @@ class WSupConLoss(nn.Module):
         exp_logits = torch.exp(logits) * logits_mask
         log_prob = logits - torch.log(exp_logits.sum(1, keepdim=True))
 
+        mask = w * mask
         # compute mean of log-likelihood over positive
         mean_log_prob_pos = (mask * log_prob).sum(1) / mask.sum(1)
 
