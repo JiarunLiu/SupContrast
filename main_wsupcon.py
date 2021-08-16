@@ -256,7 +256,7 @@ def train(train_loader, model, criterion, optimizer, epoch, opt):
             loss = criterion(features)
         elif opt.method == 'WSupCon_GT':
             weights = not_noise.float()
-            loss = criterion(features, weights=weights)
+            loss = criterion(features, labels, weights=weights)
         elif opt.method == 'WSupCon':
             raise NotImplementedError("The way to assign weight is not implemented")
         else:
