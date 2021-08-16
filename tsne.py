@@ -196,7 +196,7 @@ def get_args():
     parser.add_argument('--noise', dest='noise', default=0, type=float)
     parser.add_argument('--title', default='epoch 0', type=str)
     parser.add_argument('--ckpt', type=str, help='path to pre-trained model',
-    default='./save/SupCom/cifar10_models/SupCon_cifar10_0.0_resnet50_lr_0.05_decay_0.0001_bsz_256_temp_0.07_trial_0/last.pth')
+    default='./save/SupCon/cifar10_models/SupCon_cifar10_0.0_resnet50_lr_0.05_decay_0.0001_bsz_256_temp_0.07_trial_0/last.pth')
     parser.add_argument('--save-fig', default=None, type=str)
     # parser.add_argument('--save-fig', default="./table/tsne", type=str)
     args = parser.parse_args()
