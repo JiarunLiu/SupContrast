@@ -99,9 +99,9 @@ def set_model(opt):
                 k = k.replace("module.", "")
                 new_state_dict[k] = v
             state_dict = new_state_dict
-        model = model.cuda()
-        classifier = classifier.cuda()
-        criterion = criterion.cuda()
+        model = model.to(opt.device)
+        classifier = classifier.to(opt.device)
+        criterion = criterion.to(opt.device)
         # cudnn.benchmark = True
 
         model.load_state_dict(state_dict)
