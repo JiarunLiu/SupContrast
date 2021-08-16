@@ -171,14 +171,14 @@ def plot_tsne(args):
     for i in range(X_norm.shape[0]):
         # plt.scatter(X_norm[i,0], X_norm[i,1], c=plt.cm.Set1(y[i]))
         # plt.scatter(X_norm[i,0], X_norm[i,1], c=cm[y[i]], s=10)
-        plt.scatter(X_norm[i, 0], X_norm[i, 1], c=plt.cm.Set1(y[i]), alpha=0.6)
+        plt.scatter(X_norm[i, 0], X_norm[i, 1], c=plt.cm.Set1(y[i]), s=6, alpha=0.4)
 
 
     plt.xticks([])
     plt.yticks([])
     plt.title(args.title)
     if args.save_fig:
-        plt.savefig(os.path.join(args.save_fig, "{}-{}.png".format(args.dataset, args.title)), dpi=800)
+        plt.savefig(os.path.join(args.save_fig, "{}.png".format(args.title)), dpi=800)
     else:
         plt.show()
     print("Done")
