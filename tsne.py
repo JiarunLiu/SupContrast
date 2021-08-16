@@ -3,11 +3,12 @@ import time
 import torch
 import argparse
 import torchvision
+from torchvision import datasets
 import torchvision.transforms as transforms
 import torch.backends.cudnn as cudnn
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn import manifold, datasets
+from sklearn import manifold
 from noisy_dataset import noisify
 
 from networks.resnet_big import SupConResNet, LinearClassifier
@@ -101,7 +102,7 @@ def set_model(opt):
         model = model.cuda()
         classifier = classifier.cuda()
         criterion = criterion.cuda()
-        cudnn.benchmark = True
+        # cudnn.benchmark = True
 
         model.load_state_dict(state_dict)
 
@@ -124,10 +125,11 @@ def gen_single_features(args):
     features = np.zeros((len(train_loader.dataset), num_features), dtype=np.float32)
     labels = np.zeros(len(train_loader.dataset), dtype=np.long)
     batch_num = len(train_loader)
-    for i, (input, target, index) in enumerate(train_loader):
+    for i, (input, target) in enumerate(train_loader):
+        index = np.arange(i*args.batch_size, i*args.batch_size + len(target))
         input = input.to(args.device)
         feature = model(input)
-        features[index] = feature[i].numpy()
+        features[index] = feature.cpu().numpy()
         labels[index] = target
         print("\rget clustering data: [{}/{}]".format(i+1, batch_num), end='')
     print("\nFinish collect cluster data.")
@@ -189,6 +191,7 @@ def get_args():
     parser.add_argument('--model', type=str, default='resnet50')
     parser.add_argument('--yfile', default=None, type=str)
     parser.add_argument('--reduce', default=2000, type=int)
+    parser.add_argument('--batch_size', '-b', default=32, type=int)
     parser.add_argument('--label', default=0, type=int)
     parser.add_argument('--noise', dest='noise', default=0, type=float)
     parser.add_argument('--title', default='epoch 0', type=str)
@@ -199,7 +202,7 @@ def get_args():
     args = parser.parse_args()
 
     args.data_folder = "./data/cifar10"
-    args.batch_size = 128
+    args.n_cls = 10
 
     return args
 
