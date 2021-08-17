@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from sklearn import manifold
 from noisy_dataset import noisify
 
-from networks.resnet_big import SupConResNet, LinearClassifier
+from networks.resnet_big import SupConResNet, LinearClassifier, SupCEResNet
 
 def set_loader(opt):
     # construct data loader
@@ -82,10 +82,12 @@ def set_loader(opt):
     return train_loader, val_loader
 
 def set_model(opt):
-    model = SupConResNet(name=opt.model)
-    criterion = torch.nn.CrossEntropyLoss()
-
+    if "SupCE" in opt.ckpt:
+        model = SupConResNet(name=opt.model, num_classes=opt.n_cls)
+    else:
+        model = SupConResNet(name=opt.model)
     classifier = LinearClassifier(name=opt.model, num_classes=opt.n_cls)
+    criterion = torch.nn.CrossEntropyLoss()
 
     ckpt = torch.load(opt.ckpt, map_location='cpu')
     state_dict = ckpt['model']
@@ -128,7 +130,10 @@ def gen_single_features(args):
     for i, (input, target) in enumerate(train_loader):
         index = np.arange(i*args.batch_size, i*args.batch_size + len(target))
         input = input.to(args.device)
-        feature = model(input)
+        if "SupCE" in args.ckpt:
+            feature = model.encoder(input)
+        else:
+            feature = model(input)
         features[index] = feature.cpu().numpy()
         labels[index] = target
         print("\rget clustering data: [{}/{}]".format(i+1, batch_num), end='')
