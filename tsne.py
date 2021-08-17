@@ -120,7 +120,10 @@ def gen_single_features(args):
     # guess feature num
     for i, (input, target) in enumerate(train_loader):
         input = input.to(args.device)
-        feature = model(input)
+        if "SupCE" in args.ckpt:
+            feature = model.encoder(input)
+        else:
+            feature = model(input)
         break
     num_features = feature.shape[1]
 
