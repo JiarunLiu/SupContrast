@@ -83,7 +83,7 @@ def set_loader(opt):
 
 def set_model(opt):
     if "SupCE" in opt.ckpt:
-        model = SupConResNet(name=opt.model, num_classes=opt.n_cls)
+        model = SupCEResNet(name=opt.model, num_classes=opt.n_cls)
     else:
         model = SupConResNet(name=opt.model)
     classifier = LinearClassifier(name=opt.model, num_classes=opt.n_cls)
