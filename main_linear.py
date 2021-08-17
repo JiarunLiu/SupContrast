@@ -65,6 +65,10 @@ def parse_option():
     parser.add_argument('--yfile', type=str, default=None,
                         help='path to noisy labels')
 
+    # noisify
+    parser.add_argument('--noise', type=float, default=0.0,
+                        help="noise ratio of dataset, default: 0.0.")
+
     opt = parser.parse_args()
 
     # set the path according to the environment
